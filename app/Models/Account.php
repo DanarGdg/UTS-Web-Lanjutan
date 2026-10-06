@@ -2,9 +2,11 @@
 
 require_once __DIR__ . '/../../core/Model.php';
 
+// Model untuk tabel accounts
 class Account extends Model {
     protected $table = 'accounts';
 
+    // Mengambil seluruh data akun aktif beserta relasi tipe akun
     public function getAccounts() {
         if (!$this->db) return [];
         $stmt = $this->db->prepare("SELECT a.*, t.name as account_type_name 
@@ -15,6 +17,7 @@ class Account extends Model {
         return $stmt->fetchAll();
     }
 
+    // Mengambil satu data akun berdasarkan ID
     public function getAccountById($id) {
         if (!$this->db) return null;
         $stmt = $this->db->prepare("SELECT * FROM accounts WHERE id = :id AND deleted_at IS NULL");
@@ -22,6 +25,7 @@ class Account extends Model {
         return $stmt->fetch();
     }
 
+    // Menambahkan data akun baru ke database
     public function createAccount($data) {
         if (!$this->db) return false;
         $id = self::generateUuid();
@@ -39,6 +43,7 @@ class Account extends Model {
         ]);
     }
 
+    // Memperbarui data akun berdasarkan ID
     public function updateAccount($id, $data) {
         if (!$this->db) return false;
         $stmt = $this->db->prepare("UPDATE accounts 
@@ -55,16 +60,14 @@ class Account extends Model {
         ]);
     }
 
+    // Menghapus data akun secara soft delete (mengisi kolom deleted_at)
     public function deleteAccount($id) {
         if (!$this->db) return false;
-        // Soft delete implementation
         $stmt = $this->db->prepare("UPDATE accounts SET deleted_at = NOW() WHERE id = :id");
         return $stmt->execute(['id' => $id]);
     }
 
-    /**
-     * Find account by email for authentication
-     */
+    // Mencari data akun berdasarkan email untuk proses autentikasi
     public function findByEmail($email) {
         if (!$this->db) return null;
         $stmt = $this->db->prepare("SELECT a.*, t.name as account_type_name 

@@ -1,4 +1,4 @@
-<!-- Navbar Component -->
+<!-- Komponen navbar atas -->
 <header class="main-navbar">
     <div class="user-profile-info">
         <div class="user-details">

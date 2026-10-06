@@ -1,8 +1,10 @@
 <?php
 
+// Kelas dasar model MVC dengan koneksi PDO
 class Model {
     protected $db;
 
+    // Konstruktor untuk inisialisasi koneksi database PDO
     public function __construct() {
         $dsn = "mysql:host=" . DB_HOST . ";dbname=" . DB_NAME . ";charset=" . DB_CHARSET;
         $options = [
@@ -14,11 +16,12 @@ class Model {
         try {
             $this->db = new PDO($dsn, DB_USER, DB_PASS, $options);
         } catch (\PDOException $e) {
-            // In case DB is not yet created, handle gracefully without breaking UI
+            // Tangani error koneksi secara aman
             $this->db = null;
         }
     }
 
+    // Helper untuk membuat UUID acak versi 4
     public static function generateUuid() {
         return sprintf(
             '%04x%04x-%04x-%04x-%04x-%04x%04x%04x',

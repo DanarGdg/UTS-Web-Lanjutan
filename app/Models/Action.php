@@ -2,9 +2,11 @@
 
 require_once __DIR__ . '/../../core/Model.php';
 
+// Model untuk tabel actions
 class Action extends Model {
     protected $table = 'actions';
 
+    // Mengambil seluruh data jenis aksi yang aktif
     public function getActions() {
         if (!$this->db) return [];
         $stmt = $this->db->prepare("SELECT * FROM actions WHERE deleted_at IS NULL");
@@ -12,6 +14,7 @@ class Action extends Model {
         return $stmt->fetchAll();
     }
 
+    // Mengambil satu data jenis aksi berdasarkan ID
     public function getActionById($id) {
         if (!$this->db) return null;
         $stmt = $this->db->prepare("SELECT * FROM actions WHERE id = :id AND deleted_at IS NULL");
@@ -19,6 +22,7 @@ class Action extends Model {
         return $stmt->fetch();
     }
 
+    // Menambahkan data jenis aksi baru ke database
     public function createAction($data) {
         if (!$this->db) return false;
         $id = self::generateUuid();
@@ -31,6 +35,7 @@ class Action extends Model {
         ]);
     }
 
+    // Memperbarui data jenis aksi berdasarkan ID
     public function updateAction($id, $data) {
         if (!$this->db) return false;
         $stmt = $this->db->prepare("UPDATE actions 
@@ -43,9 +48,9 @@ class Action extends Model {
         ]);
     }
 
+    // Menghapus data jenis aksi secara soft delete (mengisi kolom deleted_at)
     public function deleteAction($id) {
         if (!$this->db) return false;
-        // Soft delete
         $stmt = $this->db->prepare("UPDATE actions SET deleted_at = NOW() WHERE id = :id");
         return $stmt->execute(['id' => $id]);
     }

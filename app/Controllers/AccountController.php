@@ -2,8 +2,10 @@
 
 require_once __DIR__ . '/../../core/Controller.php';
 
+// Controller untuk modul manajemen akun pengguna
 class AccountController extends Controller {
 
+    // Validasi sesi autentikasi pengguna
     private function checkAuth() {
         if (!isset($_SESSION['user_id'])) {
             header('Location: ' . BASE_URL . 'index.php?url=auth');
@@ -11,7 +13,7 @@ class AccountController extends Controller {
         }
     }
 
-    // Menampilkan daftar akun
+    // Menampilkan daftar seluruh akun pengguna
     public function index() {
         $this->checkAuth();
         
@@ -35,7 +37,7 @@ class AccountController extends Controller {
         $this->view('account/index', $data);
     }
 
-    // Menambah akun baru
+    // Menyimpan data akun baru
     public function store() {
         $this->checkAuth();
 
@@ -50,7 +52,7 @@ class AccountController extends Controller {
         $accountTypeId = $_POST['account_type_id'] ?? '';
         $status = $_POST['status'] ?? 'Aktif';
         $identificationNumber = trim($_POST['identification_number'] ?? '');
-        $identificationType = $_POST['identification_type'] ?? 'NIM';
+        $identificationType = $_POST['identification_type'] ?? 'NIP';
 
         if (empty($name) || empty($email) || empty($password) || empty($identificationNumber)) {
             $_SESSION['flash_error'] = 'Semua field wajib diisi.';
@@ -60,7 +62,7 @@ class AccountController extends Controller {
 
         $accountModel = $this->model('Account');
 
-        // Check duplicate email
+        // Cek duplikasi email pengguna
         if ($accountModel->findByEmail($email)) {
             $_SESSION['flash_error'] = 'Email sudah digunakan.';
             header('Location: ' . BASE_URL . 'index.php?url=account');
@@ -87,7 +89,7 @@ class AccountController extends Controller {
         exit;
     }
 
-    // Mengubah data akun
+    // Memperbarui data akun pengguna
     public function update($id = null) {
         $this->checkAuth();
 
@@ -101,7 +103,7 @@ class AccountController extends Controller {
         $accountTypeId = $_POST['account_type_id'] ?? '';
         $status = $_POST['status'] ?? 'Aktif';
         $identificationNumber = trim($_POST['identification_number'] ?? '');
-        $identificationType = $_POST['identification_type'] ?? 'NIM';
+        $identificationType = $_POST['identification_type'] ?? 'NIP';
 
         if (empty($name) || empty($email) || empty($identificationNumber)) {
             $_SESSION['flash_error'] = 'Semua field wajib diisi.';
@@ -129,7 +131,7 @@ class AccountController extends Controller {
         exit;
     }
 
-    // Menghapus akun (soft delete)
+    // Menghapus data akun (soft delete)
     public function delete($id = null) {
         $this->checkAuth();
 

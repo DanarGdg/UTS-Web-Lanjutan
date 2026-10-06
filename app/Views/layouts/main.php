@@ -4,24 +4,24 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= isset($title) ? $title . ' - ' . APP_NAME : APP_NAME ?></title>
-    <!-- Bootstrap CSS -->
+    <!-- CSS Bootstrap -->
     <link rel="stylesheet" href="<?= BASE_URL ?>bootstrap-5.0.2-dist/css/bootstrap.min.css">
-    <!-- Bootstrap Icons CDN -->
+    <!-- Icon Bootstrap -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <!-- Custom CSS -->
+    <!-- CSS Utama -->
     <link rel="stylesheet" href="<?= BASE_URL ?>public/css/style.css">
 </head>
 <body>
     <div class="wrapper">
-        <!-- Sidebar -->
+        <!-- Sidebar navigasi -->
         <?php require_once __DIR__ . '/sidebar.php'; ?>
 
-        <!-- Page Content Wrapper -->
+        <!-- Pembungkus konten -->
         <div id="content">
-            <!-- Navbar -->
+            <!-- Navbar atas -->
             <?php require_once __DIR__ . '/navbar.php'; ?>
 
-            <!-- Main Page View Content -->
+            <!-- Konten halaman -->
             <main class="page-container">
                 <?php 
                 if (isset($contentView) && file_exists($contentView)) {
@@ -32,7 +32,7 @@
         </div>
     </div>
 
-    <!-- Bootstrap JS -->
+    <!-- JS Bootstrap -->
     <script src="<?= BASE_URL ?>bootstrap-5.0.2-dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
