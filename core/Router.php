@@ -1,7 +1,7 @@
 <?php
 
 class Router {
-    protected $controller = 'AccountController';
+    protected $controller = 'AuthController';
     protected $method = 'index';
     protected $params = [];
 
@@ -9,7 +9,15 @@ class Router {
         $url = $this->parseUrl();
 
         if (isset($url[0]) && !empty($url[0])) {
-            $controllerName = ucfirst($url[0]) . 'Controller';
+            $raw = strtolower(str_replace(['_', '-'], '', $url[0]));
+            if ($raw === 'login' || $raw === 'auth') {
+                $controllerName = 'AuthController';
+            } elseif ($raw === 'accounttype') {
+                $controllerName = 'AccountTypeController';
+            } else {
+                $controllerName = ucfirst($url[0]) . 'Controller';
+            }
+
             if (file_exists(__DIR__ . '/../app/Controllers/' . $controllerName . '.php')) {
                 $this->controller = $controllerName;
                 unset($url[0]);

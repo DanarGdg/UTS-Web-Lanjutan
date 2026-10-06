@@ -61,4 +61,17 @@ class Account extends Model {
         $stmt = $this->db->prepare("UPDATE accounts SET deleted_at = NOW() WHERE id = :id");
         return $stmt->execute(['id' => $id]);
     }
+
+    /**
+     * Find account by email for authentication
+     */
+    public function findByEmail($email) {
+        if (!$this->db) return null;
+        $stmt = $this->db->prepare("SELECT a.*, t.name as account_type_name 
+                                    FROM accounts a 
+                                    LEFT JOIN account_type t ON a.account_type_id = t.id 
+                                    WHERE a.email = :email AND a.deleted_at IS NULL");
+        $stmt->execute(['email' => $email]);
+        return $stmt->fetch();
+    }
 }

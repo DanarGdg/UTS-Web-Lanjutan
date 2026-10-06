@@ -49,4 +49,21 @@ class AccountType extends Model {
         $stmt = $this->db->prepare("UPDATE account_type SET deleted_at = NOW() WHERE id = :id");
         return $stmt->execute(['id' => $id]);
     }
+
+    /**
+     * Get first available account type ID or create a default one
+     */
+    public function getOrCreateDefaultTypeId() {
+        if (!$this->db) return null;
+        $types = $this->getAccountType();
+        if (!empty($types)) {
+            return $types[0]['id'];
+        }
+
+        $id = self::generateUuid();
+        $stmt = $this->db->prepare("INSERT INTO account_type (id, name, description, created_at, updated_at) 
+                                    VALUES (:id, 'Mahasiswa', 'Akun Pengguna Mahasiswa', NOW(), NOW())");
+        $stmt->execute(['id' => $id]);
+        return $id;
+    }
 }

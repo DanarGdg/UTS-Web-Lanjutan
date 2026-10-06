@@ -1,0 +1,226 @@
+/* ======================================================
+   Auth Pages Styling (Login & Register)
+   Clean, Minimal, Modern Design matching UTS Mockup
+   ====================================================== */
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background-color: #f3f6fa;
+    color: #1e293b;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 30px 20px;
+}
+
+/* Card Container */
+.auth-card {
+    background-color: #ffffff;
+    width: 100%;
+    max-width: 400px;
+    border-radius: 14px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03), 0 1px 3px rgba(0, 0, 0, 0.04);
+    border: 1px solid #eef2f7;
+    padding: 42px 36px 38px 36px;
+}
+
+.auth-card.auth-card-wide {
+    max-width: 440px;
+    padding: 38px 36px 36px 36px;
+}
+
+/* Top Icon Badge */
+.icon-container {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 18px;
+}
+
+.brand-icon-box {
+    width: 52px;
+    height: 52px;
+    background-color: #3b66f5;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(59, 102, 245, 0.25);
+}
+
+.brand-icon-box svg {
+    width: 24px;
+    height: 24px;
+}
+
+/* Header Text */
+.card-header-text {
+    text-align: center;
+    margin-bottom: 26px;
+}
+
+.card-title {
+    font-size: 22px;
+    font-weight: 700;
+    color: #1e293b;
+    letter-spacing: -0.3px;
+    margin-bottom: 6px;
+}
+
+.card-subtitle {
+    font-size: 13.5px;
+    color: #64748b;
+    font-weight: 400;
+}
+
+/* Feedback Alerts */
+.alert-error {
+    background-color: #fef2f2;
+    border: 1px solid #fee2e2;
+    color: #dc2626;
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.alert-success {
+    background-color: #f0fdf4;
+    border: 1px solid #dcfce7;
+    color: #16a34a;
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+/* Form Elements */
+.form-group {
+    margin-bottom: 18px;
+}
+
+.form-group.compact {
+    margin-bottom: 15px;
+}
+
+.form-row {
+    display: flex;
+    gap: 12px;
+}
+
+.form-row .form-group {
+    flex: 1;
+}
+
+.form-label {
+    display: block;
+    font-size: 14px;
+    font-weight: 500;
+    color: #334155;
+    margin-bottom: 8px;
+}
+
+.form-label.compact {
+    font-size: 13.5px;
+    margin-bottom: 6px;
+}
+
+.form-control {
+    width: 100%;
+    height: 44px;
+    padding: 10px 14px;
+    font-size: 14px;
+    font-family: inherit;
+    color: #1e293b;
+    background-color: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    outline: none;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+select.form-control {
+    cursor: pointer;
+}
+
+.form-control.compact {
+    height: 42px;
+    padding: 8px 12px;
+}
+
+.form-control:focus {
+    border-color: #3b66f5;
+    box-shadow: 0 0 0 3px rgba(59, 102, 245, 0.15);
+}
+
+/* Buttons */
+.btn-auth {
+    width: 100%;
+    height: 44px;
+    background-color: #2f65f6;
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    font-size: 14.5px;
+    font-weight: 500;
+    font-family: inherit;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 24px;
+    transition: background-color 0.15s ease, transform 0.1s ease;
+}
+
+.btn-auth.compact {
+    margin-top: 20px;
+}
+
+.btn-auth:hover {
+    background-color: #2455e0;
+}
+
+.btn-auth:active {
+    transform: scale(0.99);
+}
+
+.btn-auth svg {
+    width: 16px;
+    height: 16px;
+}
+
+/* Footer Link */
+.form-footer-link {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 13.5px;
+    color: #64748b;
+}
+
+.form-footer-link.compact {
+    margin-top: 18px;
+}
+
+.form-footer-link a {
+    color: #2f65f6;
+    text-decoration: none;
+    font-weight: 600;
+    margin-left: 4px;
+    transition: color 0.15s ease;
+}
+
+.form-footer-link a:hover {
+    color: #1d4ed8;
+    text-decoration: underline;
+}
