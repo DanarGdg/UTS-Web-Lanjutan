@@ -6,11 +6,24 @@ require_once __DIR__ . '/../../core/Model.php';
 class Action extends Model {
     protected $table = 'actions';
 
-    // Mengambil seluruh data jenis aksi yang aktif
-    public function getActions() {
+    // Mengambil seluruh data jenis aksi yang aktif (bisa dicari berdasarkan nama atau deskripsi)
+    public function getActions($keyword = '') {
         if (!$this->db) return [];
-        $stmt = $this->db->prepare("SELECT * FROM actions WHERE deleted_at IS NULL");
-        $stmt->execute();
+
+        $sql = "SELECT * FROM actions WHERE deleted_at IS NULL";
+        $params = [];
+
+        if ($keyword !== '') {
+            // Nama parameter dibuat berbeda (:kw1 dan :kw2) karena PDO tidak boleh memakai nama yang sama dua kali
+            $sql .= " AND (name LIKE :kw1 OR description LIKE :kw2)";
+            $params['kw1'] = '%' . $keyword . '%';
+            $params['kw2'] = '%' . $keyword . '%';
+        }
+
+        $sql .= " ORDER BY created_at ASC, name ASC";
+
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute($params);
         return $stmt->fetchAll();
     }
 
