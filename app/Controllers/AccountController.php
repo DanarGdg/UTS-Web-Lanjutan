@@ -13,28 +13,52 @@ class AccountController extends Controller {
         }
     }
 
-    // Menampilkan daftar seluruh akun pengguna
+    // Menampilkan daftar seluruh akun pengguna (dengan fitur pencarian server-side)
     public function index() {
         $this->checkAuth();
         
+        $keyword = trim($_GET['q'] ?? '');
         $accountModel = $this->model('Account');
-        $accountTypeModel = $this->model('AccountType');
 
-        $accounts = $accountModel->getAccounts();
-        $accountTypes = $accountTypeModel->getAccountType();
+        $accounts = $accountModel->getAccounts($keyword);
+
+        $flash = $_SESSION['flash'] ?? null;
+        unset($_SESSION['flash']);
 
         $data = [
             'title' => 'Manajemen Akun',
             'activeMenu' => 'account',
             'accounts' => $accounts,
-            'accountTypes' => $accountTypes,
-            'flash_success' => $_SESSION['flash_success'] ?? '',
-            'flash_error' => $_SESSION['flash_error'] ?? ''
+            'keyword' => $keyword,
+            'flash' => $flash
         ];
 
-        unset($_SESSION['flash_success'], $_SESSION['flash_error']);
-
         $this->view('account/index', $data);
+    }
+
+    // Menampilkan halaman form untuk menambah akun baru
+    public function create() {
+        $this->checkAuth();
+
+        $accountModel = $this->model('Account');
+        $accountTypeModel = $this->model('AccountType');
+        
+        $accountTypes = $accountTypeModel->getAccountType();
+        $usedTypeIds = $accountModel->getUsedAccountTypeIds();
+
+        $flash = $_SESSION['flash'] ?? null;
+        unset($_SESSION['flash']);
+
+        $data = [
+            'title' => 'Tambah Akun Baru',
+            'activeMenu' => 'account',
+            'account' => null,
+            'accountTypes' => $accountTypes,
+            'usedTypeIds' => $usedTypeIds,
+            'flash' => $flash
+        ];
+
+        $this->view('account/form', $data);
     }
 
     // Menyimpan data akun baru
@@ -54,9 +78,9 @@ class AccountController extends Controller {
         $identificationNumber = trim($_POST['identification_number'] ?? '');
         $identificationType = $_POST['identification_type'] ?? 'NIP';
 
-        if (empty($name) || empty($email) || empty($password) || empty($identificationNumber)) {
-            $_SESSION['flash_error'] = 'Semua field wajib diisi.';
-            header('Location: ' . BASE_URL . 'index.php?url=account');
+        if (empty($name) || empty($email) || empty($password) || empty($identificationNumber) || empty($accountTypeId)) {
+            $_SESSION['flash'] = ['type' => 'danger', 'message' => 'Semua field wajib diisi.'];
+            header('Location: ' . BASE_URL . 'index.php?url=account/create');
             exit;
         }
 
@@ -64,8 +88,18 @@ class AccountController extends Controller {
 
         // Cek duplikasi email pengguna
         if ($accountModel->findByEmail($email)) {
-            $_SESSION['flash_error'] = 'Email sudah digunakan.';
-            header('Location: ' . BASE_URL . 'index.php?url=account');
+            $_SESSION['flash'] = ['type' => 'danger', 'message' => 'Email sudah digunakan oleh akun lain.'];
+            header('Location: ' . BASE_URL . 'index.php?url=account/create');
+            exit;
+        }
+
+        // Cek batasan relasi 1:1 antara account dan account_type
+        if ($accountModel->isAccountTypeUsed($accountTypeId)) {
+            $_SESSION['flash'] = [
+                'type' => 'danger', 
+                'message' => 'Tipe akun yang dipilih sudah digunakan oleh akun lain. Karena relasi 1:1, satu tipe akun hanya dapat terhubung ke satu akun.'
+            ];
+            header('Location: ' . BASE_URL . 'index.php?url=account/create');
             exit;
         }
 
@@ -80,13 +114,50 @@ class AccountController extends Controller {
         ]);
 
         if ($created) {
-            $_SESSION['flash_success'] = 'Akun baru berhasil ditambahkan!';
+            $_SESSION['flash'] = ['type' => 'success', 'message' => 'Akun baru berhasil ditambahkan!'];
+            header('Location: ' . BASE_URL . 'index.php?url=account');
         } else {
-            $_SESSION['flash_error'] = 'Gagal menambahkan akun baru.';
+            $_SESSION['flash'] = ['type' => 'danger', 'message' => 'Gagal menambahkan akun baru karena kendala basis data.'];
+            header('Location: ' . BASE_URL . 'index.php?url=account/create');
+        }
+        exit;
+    }
+
+    // Menampilkan halaman form untuk mengubah data akun
+    public function edit($id = null) {
+        $this->checkAuth();
+
+        if (empty($id)) {
+            header('Location: ' . BASE_URL . 'index.php?url=account');
+            exit;
         }
 
-        header('Location: ' . BASE_URL . 'index.php?url=account');
-        exit;
+        $accountModel = $this->model('Account');
+        $account = $accountModel->getAccountById($id);
+
+        if (!$account) {
+            $_SESSION['flash'] = ['type' => 'danger', 'message' => 'Data akun tidak ditemukan.'];
+            header('Location: ' . BASE_URL . 'index.php?url=account');
+            exit;
+        }
+
+        $accountTypeModel = $this->model('AccountType');
+        $accountTypes = $accountTypeModel->getAccountType();
+        $usedTypeIds = $accountModel->getUsedAccountTypeIds($id);
+
+        $flash = $_SESSION['flash'] ?? null;
+        unset($_SESSION['flash']);
+
+        $data = [
+            'title' => 'Ubah Data Akun',
+            'activeMenu' => 'account',
+            'account' => $account,
+            'accountTypes' => $accountTypes,
+            'usedTypeIds' => $usedTypeIds,
+            'flash' => $flash
+        ];
+
+        $this->view('account/form', $data);
     }
 
     // Memperbarui data akun pengguna
@@ -100,21 +171,42 @@ class AccountController extends Controller {
 
         $name = trim($_POST['name'] ?? '');
         $email = trim($_POST['email'] ?? '');
+        $password = $_POST['password'] ?? '';
         $accountTypeId = $_POST['account_type_id'] ?? '';
         $status = $_POST['status'] ?? 'Aktif';
         $identificationNumber = trim($_POST['identification_number'] ?? '');
         $identificationType = $_POST['identification_type'] ?? 'NIP';
 
-        if (empty($name) || empty($email) || empty($identificationNumber)) {
-            $_SESSION['flash_error'] = 'Semua field wajib diisi.';
-            header('Location: ' . BASE_URL . 'index.php?url=account');
+        if (empty($name) || empty($email) || empty($identificationNumber) || empty($accountTypeId)) {
+            $_SESSION['flash'] = ['type' => 'danger', 'message' => 'Semua field wajib diisi.'];
+            header('Location: ' . BASE_URL . 'index.php?url=account/edit/' . $id);
             exit;
         }
 
         $accountModel = $this->model('Account');
+
+        // Cek jika email diganti dan ternyata duplikat
+        $existing = $accountModel->findByEmail($email);
+        if ($existing && $existing['id'] !== $id) {
+            $_SESSION['flash'] = ['type' => 'danger', 'message' => 'Email sudah digunakan oleh akun lain.'];
+            header('Location: ' . BASE_URL . 'index.php?url=account/edit/' . $id);
+            exit;
+        }
+
+        // Cek batasan relasi 1:1 antara account dan account_type
+        if ($accountModel->isAccountTypeUsed($accountTypeId, $id)) {
+            $_SESSION['flash'] = [
+                'type' => 'danger', 
+                'message' => 'Tipe akun yang dipilih sudah digunakan oleh akun lain. Karena relasi 1:1, satu tipe akun hanya dapat terhubung ke satu akun.'
+            ];
+            header('Location: ' . BASE_URL . 'index.php?url=account/edit/' . $id);
+            exit;
+        }
+
         $updated = $accountModel->updateAccount($id, [
             'name' => $name,
             'email' => $email,
+            'password' => $password,
             'account_type_id' => $accountTypeId,
             'status' => $status,
             'identification_number' => $identificationNumber,
@@ -122,12 +214,12 @@ class AccountController extends Controller {
         ]);
 
         if ($updated) {
-            $_SESSION['flash_success'] = 'Data akun berhasil diperbarui!';
+            $_SESSION['flash'] = ['type' => 'success', 'message' => 'Data akun berhasil diperbarui!'];
+            header('Location: ' . BASE_URL . 'index.php?url=account');
         } else {
-            $_SESSION['flash_error'] = 'Gagal memperbarui data akun.';
+            $_SESSION['flash'] = ['type' => 'danger', 'message' => 'Gagal memperbarui data akun karena kendala basis data.'];
+            header('Location: ' . BASE_URL . 'index.php?url=account/edit/' . $id);
         }
-
-        header('Location: ' . BASE_URL . 'index.php?url=account');
         exit;
     }
 
@@ -135,7 +227,7 @@ class AccountController extends Controller {
     public function delete($id = null) {
         $this->checkAuth();
 
-        if (empty($id)) {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST' || empty($id)) {
             header('Location: ' . BASE_URL . 'index.php?url=account');
             exit;
         }
@@ -144,9 +236,9 @@ class AccountController extends Controller {
         $deleted = $accountModel->deleteAccount($id);
 
         if ($deleted) {
-            $_SESSION['flash_success'] = 'Akun berhasil dihapus!';
+            $_SESSION['flash'] = ['type' => 'success', 'message' => 'Akun berhasil dihapus!'];
         } else {
-            $_SESSION['flash_error'] = 'Gagal menghapus akun.';
+            $_SESSION['flash'] = ['type' => 'danger', 'message' => 'Gagal menghapus akun.'];
         }
 
         header('Location: ' . BASE_URL . 'index.php?url=account');

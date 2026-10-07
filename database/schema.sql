@@ -30,7 +30,7 @@ CREATE TABLE IF NOT EXISTS `accounts` (
     `name` VARCHAR(128) NOT NULL,
     `email` VARCHAR(128) NOT NULL,
     `password` TEXT NOT NULL,
-    `account_type_id` CHAR(36) NOT NULL UNIQUE, -- Unique for 1:1 relationship with account_type
+    `account_type_id` CHAR(36) NULL UNIQUE, -- Unique for 1:1 relationship with account_type
     `status` VARCHAR(128) NOT NULL,
     `identification_number` VARCHAR(128) NOT NULL,
     `identification_type` ENUM('NIM', 'NIP') NOT NULL,
@@ -41,7 +41,7 @@ CREATE TABLE IF NOT EXISTS `accounts` (
     CONSTRAINT `fk_accounts_account_type` 
         FOREIGN KEY (`account_type_id`) 
         REFERENCES `account_type` (`id`) 
-        ON DELETE RESTRICT 
+        ON DELETE SET NULL 
         ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
