@@ -41,16 +41,11 @@ CREATE TABLE IF NOT EXISTS `accounts` (
     CONSTRAINT `fk_accounts_account_type` 
         FOREIGN KEY (`account_type_id`) 
         REFERENCES `account_type` (`id`) 
-        ON DELETE CASCADE 
+        ON DELETE RESTRICT 
         ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 
--- ========================================================
--- SEEDERS DATA DUMMY
--- ========================================================
-
--- Seeders untuk tabel account_type
 INSERT INTO `account_type` (`id`, `name`, `description`, `created_at`, `updated_at`) VALUES
 ('550e8400-e29b-41d4-a716-446655440001', 'Admin', 'Tipe akun dengan hak akses penuh ke seluruh sistem.', NOW(), NOW()),
 ('550e8400-e29b-41d4-a716-446655440002', 'Dosen', 'Tipe akun pengajar/dosen untuk mengakses fitur akademik.', NOW(), NOW()),

@@ -6,11 +6,23 @@ require_once __DIR__ . '/../../core/Model.php';
 class AccountType extends Model {
     protected $table = 'account_type';
 
-    // Mengambil seluruh data tipe akun yang aktif
-    public function getAccountType() {
+    // Mengambil seluruh data tipe akun yang aktif 
+    public function getAccountType($keyword = '') {
         if (!$this->db) return [];
-        $stmt = $this->db->prepare("SELECT * FROM account_type WHERE deleted_at IS NULL");
-        $stmt->execute();
+
+        $sql = "SELECT * FROM account_type WHERE deleted_at IS NULL";
+        $params = [];
+
+        if ($keyword !== '') {
+            $sql .= " AND (name LIKE :kw1 OR description LIKE :kw2)";
+            $params['kw1'] = '%' . $keyword . '%';
+            $params['kw2'] = '%' . $keyword . '%';
+        }
+
+        $sql .= " ORDER BY created_at ASC, name ASC";
+
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute($params);
         return $stmt->fetchAll();
     }
 
@@ -53,6 +65,14 @@ class AccountType extends Model {
         if (!$this->db) return false;
         $stmt = $this->db->prepare("UPDATE account_type SET deleted_at = NOW() WHERE id = :id");
         return $stmt->execute(['id' => $id]);
+    }
+
+    // Menghitung akun aktif yang masih memakai tipe akun ini
+    public function countActiveAccounts($id) {
+        if (!$this->db) return 0;
+        $stmt = $this->db->prepare("SELECT COUNT(*) FROM accounts WHERE account_type_id = :id AND deleted_at IS NULL");
+        $stmt->execute(['id' => $id]);
+        return (int) $stmt->fetchColumn();
     }
 
     // Mengambil ID tipe akun yang tersedia atau membuat default Mahasiswa jika tabel masih kosong
