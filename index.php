@@ -16,3 +16,4 @@ require_once __DIR__ . '/core/Model.php';
 
 // Inisialisasi router aplikasi
 $app = new Router();
+
