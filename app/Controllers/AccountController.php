@@ -84,11 +84,30 @@ class AccountController extends Controller {
             exit;
         }
 
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            $_SESSION['flash'] = ['type' => 'danger', 'message' => 'Format email tidak valid.'];
+            header('Location: ' . BASE_URL . 'index.php?url=account/create');
+            exit;
+        }
+
+        if (strlen($password) < 6) {
+            $_SESSION['flash'] = ['type' => 'danger', 'message' => 'Password harus memiliki minimal 6 karakter.'];
+            header('Location: ' . BASE_URL . 'index.php?url=account/create');
+            exit;
+        }
+
         $accountModel = $this->model('Account');
 
         // Cek duplikasi email pengguna
         if ($accountModel->findByEmail($email)) {
             $_SESSION['flash'] = ['type' => 'danger', 'message' => 'Email sudah digunakan oleh akun lain.'];
+            header('Location: ' . BASE_URL . 'index.php?url=account/create');
+            exit;
+        }
+
+        // Cek duplikasi nomor identitas
+        if ($accountModel->findByIdentificationNumber($identificationNumber)) {
+            $_SESSION['flash'] = ['type' => 'danger', 'message' => 'Nomor Identitas sudah terdaftar pada akun lain.'];
             header('Location: ' . BASE_URL . 'index.php?url=account/create');
             exit;
         }
@@ -183,12 +202,31 @@ class AccountController extends Controller {
             exit;
         }
 
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            $_SESSION['flash'] = ['type' => 'danger', 'message' => 'Format email tidak valid.'];
+            header('Location: ' . BASE_URL . 'index.php?url=account/edit/' . $id);
+            exit;
+        }
+
+        if (!empty($password) && strlen($password) < 6) {
+            $_SESSION['flash'] = ['type' => 'danger', 'message' => 'Password harus memiliki minimal 6 karakter jika ingin diubah.'];
+            header('Location: ' . BASE_URL . 'index.php?url=account/edit/' . $id);
+            exit;
+        }
+
         $accountModel = $this->model('Account');
 
         // Cek jika email diganti dan ternyata duplikat
         $existing = $accountModel->findByEmail($email);
         if ($existing && $existing['id'] !== $id) {
             $_SESSION['flash'] = ['type' => 'danger', 'message' => 'Email sudah digunakan oleh akun lain.'];
+            header('Location: ' . BASE_URL . 'index.php?url=account/edit/' . $id);
+            exit;
+        }
+
+        // Cek jika nomor identitas diganti dan sudah digunakan oleh akun lain
+        if ($accountModel->findByIdentificationNumber($identificationNumber, $id)) {
+            $_SESSION['flash'] = ['type' => 'danger', 'message' => 'Nomor Identitas sudah terdaftar pada akun lain.'];
             header('Location: ' . BASE_URL . 'index.php?url=account/edit/' . $id);
             exit;
         }

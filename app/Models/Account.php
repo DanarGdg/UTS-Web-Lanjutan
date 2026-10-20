@@ -171,4 +171,25 @@ class Account extends Model {
             return null;
         }
     }
+
+    // Mencari data akun berdasarkan nomor identitas (NIM/NIP)
+    public function findByIdentificationNumber($identificationNumber, $excludeAccountId = null) {
+        if (!$this->db || empty($identificationNumber)) return null;
+
+        try {
+            $sql = "SELECT id FROM accounts WHERE identification_number = :id_num AND deleted_at IS NULL";
+            $params = ['id_num' => $identificationNumber];
+
+            if (!empty($excludeAccountId)) {
+                $sql .= " AND id != :exclude_id";
+                $params['exclude_id'] = $excludeAccountId;
+            }
+
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute($params);
+            return $stmt->fetch() ?: null;
+        } catch (\PDOException $e) {
+            return null;
+        }
+    }
 }

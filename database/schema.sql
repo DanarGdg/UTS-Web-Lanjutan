@@ -46,6 +46,18 @@ CREATE TABLE IF NOT EXISTS `accounts` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 
+-- Table 4: users (Modul Registrasi & Login Captcha sesuai PPT)
+CREATE TABLE IF NOT EXISTS `users` (
+    `id` INT(11) NOT NULL AUTO_INCREMENT,
+    `name` VARCHAR(70) NOT NULL,
+    `username` VARCHAR(50) NOT NULL UNIQUE,
+    `email` VARCHAR(50) NOT NULL,
+    `password` VARCHAR(255) NOT NULL,
+    `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 INSERT INTO `account_type` (`id`, `name`, `description`, `created_at`, `updated_at`) VALUES
 ('550e8400-e29b-41d4-a716-446655440001', 'Admin', 'Tipe akun dengan hak akses penuh ke seluruh sistem.', NOW(), NOW()),
 ('550e8400-e29b-41d4-a716-446655440002', 'Dosen', 'Tipe akun pengajar/dosen untuk mengakses fitur akademik.', NOW(), NOW()),
