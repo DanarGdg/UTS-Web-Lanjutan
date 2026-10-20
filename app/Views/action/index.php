@@ -1,9 +1,11 @@
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h2 class="h4 mb-0 fw-bold text-dark">Jenis Aksi</h2>
-    <a href="<?= BASE_URL ?>index.php?url=action/create" class="btn btn-primary btn-sm d-flex align-items-center gap-1">
-        <i class="bi bi-plus-lg"></i>
-        <span>Tambah Aksi</span>
-    </a>
+    <?php if ($isAdmin ?? false): ?>
+        <a href="<?= BASE_URL ?>index.php?url=action/create" class="btn btn-primary btn-sm d-flex align-items-center gap-1">
+            <i class="bi bi-plus-lg"></i>
+            <span>Tambah Aksi</span>
+        </a>
+    <?php endif; ?>
 </div>
 
 <!-- Pesan sukses/gagal -->
@@ -36,13 +38,15 @@
                     <th class="fw-bold">Nama</th>
                     <th class="fw-bold">Deskripsi</th>
                     <th class="fw-bold">Dibuat</th>
-                    <th class="fw-bold text-end" style="width: 100px;">Aksi</th>
+                    <?php if ($isAdmin ?? false): ?>
+                        <th class="fw-bold text-end" style="width: 100px;">Aksi</th>
+                    <?php endif; ?>
                 </tr>
             </thead>
             <tbody>
                 <?php if (empty($actions)): ?>
                     <tr>
-                        <td colspan="4" class="text-center text-muted py-5">
+                        <td colspan="<?= ($isAdmin ?? false) ? '4' : '3' ?>" class="text-center text-muted py-5">
                             <i class="bi bi-inbox fs-2 d-block mb-2 text-secondary"></i>
                             <span>Data jenis aksi tidak ditemukan.</span>
                         </td>
@@ -53,22 +57,24 @@
                             <td class="fw-bold text-dark"><?= htmlspecialchars($item['name']) ?></td>
                             <td><?= htmlspecialchars($item['description'] ?? '-') ?></td>
                             <td><?= date('d M Y H:i', strtotime($item['created_at'])) ?></td>
-                            <td class="text-end">
-                                <div class="d-flex justify-content-end gap-1">
-                                    <a href="<?= BASE_URL ?>index.php?url=action/edit/<?= $item['id'] ?>"
-                                       class="btn btn-outline-warning btn-sm" title="Ubah">
-                                        <i class="bi bi-pencil"></i>
-                                    </a>
-                                    <form method="POST"
-                                          action="<?= BASE_URL ?>index.php?url=action/delete/<?= $item['id'] ?>"
-                                          class="d-inline"
-                                          onsubmit="return confirm('Hapus jenis aksi ini?');">
-                                        <button type="submit" class="btn btn-outline-danger btn-sm" title="Hapus">
-                                            <i class="bi bi-trash"></i>
-                                        </button>
-                                    </form>
-                                </div>
-                            </td>
+                            <?php if ($isAdmin ?? false): ?>
+                                <td class="text-end">
+                                    <div class="d-flex justify-content-end gap-1">
+                                        <a href="<?= BASE_URL ?>index.php?url=action/edit/<?= $item['id'] ?>"
+                                           class="btn btn-outline-warning btn-sm" title="Ubah">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                        <form method="POST"
+                                              action="<?= BASE_URL ?>index.php?url=action/delete/<?= $item['id'] ?>"
+                                              class="d-inline"
+                                              onsubmit="return confirm('Hapus jenis aksi ini?');">
+                                            <button type="submit" class="btn btn-outline-danger btn-sm" title="Hapus">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            <?php endif; ?>
                         </tr>
                     <?php endforeach; ?>
                 <?php endif; ?>

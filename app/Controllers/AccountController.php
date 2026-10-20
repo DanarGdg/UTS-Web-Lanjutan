@@ -30,7 +30,8 @@ class AccountController extends Controller {
             'activeMenu' => 'account',
             'accounts' => $accounts,
             'keyword' => $keyword,
-            'flash' => $flash
+            'flash' => $flash,
+            'isAdmin' => $this->isAdmin()
         ];
 
         $this->view('account/index', $data);
@@ -39,12 +40,11 @@ class AccountController extends Controller {
     // Menampilkan halaman form untuk menambah akun baru
     public function create() {
         $this->checkAuth();
+        $this->checkAdmin('account');
 
-        $accountModel = $this->model('Account');
         $accountTypeModel = $this->model('AccountType');
         
         $accountTypes = $accountTypeModel->getAccountType();
-        $usedTypeIds = $accountModel->getUsedAccountTypeIds();
 
         $flash = $_SESSION['flash'] ?? null;
         unset($_SESSION['flash']);
@@ -54,7 +54,6 @@ class AccountController extends Controller {
             'activeMenu' => 'account',
             'account' => null,
             'accountTypes' => $accountTypes,
-            'usedTypeIds' => $usedTypeIds,
             'flash' => $flash
         ];
 
@@ -64,6 +63,7 @@ class AccountController extends Controller {
     // Menyimpan data akun baru
     public function store() {
         $this->checkAuth();
+        $this->checkAdmin('account');
 
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             header('Location: ' . BASE_URL . 'index.php?url=account');
@@ -93,12 +93,9 @@ class AccountController extends Controller {
             exit;
         }
 
-        // Cek batasan relasi 1:1 antara account dan account_type
-        if ($accountModel->isAccountTypeUsed($accountTypeId)) {
-            $_SESSION['flash'] = [
-                'type' => 'danger', 
-                'message' => 'Tipe akun yang dipilih sudah digunakan oleh akun lain. Karena relasi 1:1, satu tipe akun hanya dapat terhubung ke satu akun.'
-            ];
+        // cek duplikasi nomor identifikasi pengguna
+        if ($accountModel->findByIdentificationNumber($identificationNumber)) {
+            $_SESSION['flash'] = ['type' => 'danger', 'message' => 'Nomor identifikasi sudah digunakan oleh akun lain.'];
             header('Location: ' . BASE_URL . 'index.php?url=account/create');
             exit;
         }
@@ -126,6 +123,7 @@ class AccountController extends Controller {
     // Menampilkan halaman form untuk mengubah data akun
     public function edit($id = null) {
         $this->checkAuth();
+        $this->checkAdmin('account');
 
         if (empty($id)) {
             header('Location: ' . BASE_URL . 'index.php?url=account');
@@ -143,7 +141,6 @@ class AccountController extends Controller {
 
         $accountTypeModel = $this->model('AccountType');
         $accountTypes = $accountTypeModel->getAccountType();
-        $usedTypeIds = $accountModel->getUsedAccountTypeIds($id);
 
         $flash = $_SESSION['flash'] ?? null;
         unset($_SESSION['flash']);
@@ -153,7 +150,6 @@ class AccountController extends Controller {
             'activeMenu' => 'account',
             'account' => $account,
             'accountTypes' => $accountTypes,
-            'usedTypeIds' => $usedTypeIds,
             'flash' => $flash
         ];
 
@@ -163,6 +159,7 @@ class AccountController extends Controller {
     // Memperbarui data akun pengguna
     public function update($id = null) {
         $this->checkAuth();
+        $this->checkAdmin('account');
 
         if ($_SERVER['REQUEST_METHOD'] !== 'POST' || empty($id)) {
             header('Location: ' . BASE_URL . 'index.php?url=account');
@@ -193,12 +190,9 @@ class AccountController extends Controller {
             exit;
         }
 
-        // Cek batasan relasi 1:1 antara account dan account_type
-        if ($accountModel->isAccountTypeUsed($accountTypeId, $id)) {
-            $_SESSION['flash'] = [
-                'type' => 'danger', 
-                'message' => 'Tipe akun yang dipilih sudah digunakan oleh akun lain. Karena relasi 1:1, satu tipe akun hanya dapat terhubung ke satu akun.'
-            ];
+        // Cek jika nomor identifikasi diganti dan ternyata duplikat
+        if ($accountModel->findByIdentificationNumber($identificationNumber, $id)) {
+            $_SESSION['flash'] = ['type' => 'danger', 'message' => 'Nomor identifikasi sudah digunakan oleh akun lain.'];
             header('Location: ' . BASE_URL . 'index.php?url=account/edit/' . $id);
             exit;
         }
@@ -226,6 +220,7 @@ class AccountController extends Controller {
     // Menghapus data akun (soft delete)
     public function delete($id = null) {
         $this->checkAuth();
+        $this->checkAdmin('account');
 
         if ($_SERVER['REQUEST_METHOD'] !== 'POST' || empty($id)) {
             header('Location: ' . BASE_URL . 'index.php?url=account');

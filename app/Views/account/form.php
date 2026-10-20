@@ -1,7 +1,6 @@
 <?php
 $isEdit = !empty($account);
 $action = $isEdit ? 'account/update/' . $account['id'] : 'account/store';
-$usedTypeIds = $usedTypeIds ?? [];
 ?>
 
 <div class="card shadow-sm border-0">
@@ -64,13 +63,10 @@ $usedTypeIds = $usedTypeIds ?? [];
                             <?php foreach ($accountTypes as $type): ?>
                                 <?php 
                                 $isSelected = ($account['account_type_id'] ?? '') === $type['id'];
-                                $isUsed = in_array($type['id'], $usedTypeIds);
                                 ?>
                                 <option value="<?= htmlspecialchars($type['id']) ?>"
-                                    <?= $isSelected ? 'selected' : '' ?>
-                                    <?= ($isUsed && !$isSelected) ? 'disabled' : '' ?>>
+                                    <?= $isSelected ? 'selected' : '' ?>>
                                     <?= htmlspecialchars($type['name']) ?>
-                                    <?= ($isUsed && !$isSelected) ? ' (Sudah Digunakan)' : '' ?>
                                 </option>
                             <?php endforeach; ?>
                         <?php endif; ?>

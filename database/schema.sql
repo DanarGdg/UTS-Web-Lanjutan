@@ -30,7 +30,7 @@ CREATE TABLE IF NOT EXISTS `accounts` (
     `name` VARCHAR(128) NOT NULL,
     `email` VARCHAR(128) NOT NULL,
     `password` TEXT NOT NULL,
-    `account_type_id` CHAR(36) NULL UNIQUE, -- Unique for 1:1 relationship with account_type
+    `account_type_id` CHAR(36) NULL,
     `status` VARCHAR(128) NOT NULL,
     `identification_number` VARCHAR(128) NOT NULL,
     `identification_type` ENUM('NIM', 'NIP') NOT NULL,
@@ -38,6 +38,7 @@ CREATE TABLE IF NOT EXISTS `accounts` (
     `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     `deleted_at` DATETIME NULL DEFAULT NULL,
     PRIMARY KEY (`id`),
+    UNIQUE KEY `uq_accounts_identification_number` (`identification_number`),
     CONSTRAINT `fk_accounts_account_type` 
         FOREIGN KEY (`account_type_id`) 
         REFERENCES `account_type` (`id`) 

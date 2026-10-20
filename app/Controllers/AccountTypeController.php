@@ -29,13 +29,15 @@ class AccountTypeController extends Controller {
             'activeMenu' => 'account_type',
             'accountTypes' => $model->getAccountType($keyword),
             'keyword' => $keyword,
-            'flash' => $flash
+            'flash' => $flash,
+            'isAdmin' => $this->isAdmin()
         ]);
     }
 
     // Menampilkan form tambah tipe akun
     public function create() {
         $this->checkAuth();
+        $this->checkAdmin('accountType');
 
         $this->view('account_type/form', [
             'title' => 'Tambah Tipe Akun',
@@ -47,6 +49,7 @@ class AccountTypeController extends Controller {
     // Menyimpan tipe akun baru
     public function store() {
         $this->checkAuth();
+        $this->checkAdmin('accountType');
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $name = trim($_POST['name'] ?? '');
@@ -68,6 +71,7 @@ class AccountTypeController extends Controller {
     // Menampilkan form ubah tipe akun
     public function edit($id = null) {
         $this->checkAuth();
+        $this->checkAdmin('accountType');
 
         $model = $this->model('AccountType');
         $accountType = $id ? $model->getAccountTypeById($id) : null;
@@ -89,6 +93,7 @@ class AccountTypeController extends Controller {
     // Menyimpan perubahan tipe akun
     public function update($id = null) {
         $this->checkAuth();
+        $this->checkAdmin('accountType');
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST' && $id) {
             $name = trim($_POST['name'] ?? '');
@@ -110,6 +115,7 @@ class AccountTypeController extends Controller {
     // Menghapus tipe akun (soft delete), kecuali masih dipakai akun aktif
     public function delete($id = null) {
         $this->checkAuth();
+        $this->checkAdmin('accountType');
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST' && $id) {
             $model = $this->model('AccountType');

@@ -29,13 +29,15 @@ class ActionController extends Controller {
             'activeMenu' => 'action',
             'actions' => $model->getActions($keyword),
             'keyword' => $keyword,
-            'flash' => $flash
+            'flash' => $flash,
+            'isAdmin' => $this->isAdmin()
         ]);
     }
 
     // Menampilkan form tambah jenis aksi
     public function create() {
         $this->checkAuth();
+        $this->checkAdmin('action');
 
         $this->view('action/form', [
             'title' => 'Tambah Jenis Aksi',
@@ -47,6 +49,7 @@ class ActionController extends Controller {
     // Menyimpan jenis aksi baru
     public function store() {
         $this->checkAuth();
+        $this->checkAdmin('action');
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $name = trim($_POST['name'] ?? '');
@@ -68,6 +71,7 @@ class ActionController extends Controller {
     // Menampilkan form ubah jenis aksi
     public function edit($id = null) {
         $this->checkAuth();
+        $this->checkAdmin('action');
 
         $model = $this->model('Action');
         $actionItem = $id ? $model->getActionById($id) : null;
@@ -89,6 +93,7 @@ class ActionController extends Controller {
     // Menyimpan perubahan jenis aksi
     public function update($id = null) {
         $this->checkAuth();
+        $this->checkAdmin('action');
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST' && $id) {
             $name = trim($_POST['name'] ?? '');
@@ -110,6 +115,7 @@ class ActionController extends Controller {
     // Menghapus jenis aksi (soft delete)
     public function delete($id = null) {
         $this->checkAuth();
+        $this->checkAdmin('action');
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST' && $id) {
             $model = $this->model('Action');

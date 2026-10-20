@@ -2,10 +2,12 @@
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h2 class="h4 mb-0 fw-bold text-dark">Manajemen Akun</h2>
     <!-- Tombol tambah akun baru -->
-    <a href="<?= BASE_URL ?>index.php?url=account/create" class="btn btn-primary btn-sm d-flex align-items-center gap-1">
-        <i class="bi bi-plus-lg"></i>
-        <span>Tambah Akun</span>
-    </a>
+    <?php if ($isAdmin ?? false): ?>
+        <a href="<?= BASE_URL ?>index.php?url=account/create" class="btn btn-primary btn-sm d-flex align-items-center gap-1">
+            <i class="bi bi-plus-lg"></i>
+            <span>Tambah Akun</span>
+        </a>
+    <?php endif; ?>
 </div>
 
 <!-- Notifikasi pesan -->
@@ -46,7 +48,9 @@
                     <th class="fw-bold">Identitas</th>
                     <th class="fw-bold">Tipe Akun</th>
                     <th class="fw-bold">Status</th>
-                    <th class="fw-bold text-center" style="width: 100px;">Aksi</th>
+                    <?php if ($isAdmin ?? false): ?>
+                        <th class="fw-bold text-center" style="width: 100px;">Aksi</th>
+                    <?php endif; ?>
                 </tr>
             </thead>
             <tbody>
@@ -67,27 +71,26 @@
                                 <span class="badge rounded-pill bg-danger px-3 py-2"><?= htmlspecialchars($acc['status']) ?></span>
                             <?php endif; ?>
                         </td>
-                        <td class="text-center">
-                            <div class="d-flex justify-content-center gap-1">
-                                <!-- Tombol ubah akun -->
-                                <a href="<?= BASE_URL ?>index.php?url=account/edit/<?= $acc['id'] ?>" 
-                                   class="btn btn-outline-warning btn-sm" 
-                                   title="Ubah Akun">
-                                    <i class="bi bi-pencil"></i>
-                                </a>
-                                <!-- Tombol hapus akun -->
-                                <form method="POST" action="<?= BASE_URL ?>index.php?url=account/delete/<?= $acc['id'] ?>" class="d-inline" onsubmit="return confirm('Apakah Anda yakin ingin menghapus akun ini?');">
-                                    <button type="submit" class="btn btn-outline-danger btn-sm" title="Hapus Akun">
-                                        <i class="bi bi-trash"></i>
-                                    </button>
-                                </form>
-                            </div>
-                        </td>
+                        <?php if ($isAdmin ?? false): ?>
+                            <td class="text-center">
+                                <div class="d-flex justify-content-center gap-1">
+                                    <a href="<?= BASE_URL ?>index.php?url=account/edit/<?= $acc['id'] ?>"
+                                       class="btn btn-outline-warning btn-sm" title="Ubah Akun">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <form method="POST" action="<?= BASE_URL ?>index.php?url=account/delete/<?= $acc['id'] ?>" class="d-inline" onsubmit="return confirm('Apakah Anda yakin ingin menghapus akun ini?');">
+                                        <button type="submit" class="btn btn-outline-danger btn-sm" title="Hapus Akun">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        <?php endif; ?>
                     </tr>
                     <?php endforeach; ?>
                 <?php else: ?>
                     <tr>
-                        <td colspan="6" class="text-center py-5 text-muted">
+                        <td colspan="<?= ($isAdmin ?? false) ? '6' : '5' ?>" class="text-center py-5 text-muted">
                             <i class="bi bi-inbox fs-2 d-block mb-2 text-secondary"></i>
                             <span>Data akun tidak ditemukan.</span>
                         </td>

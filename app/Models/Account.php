@@ -51,13 +51,15 @@ class Account extends Model {
         }
     }
 
-    // Mengecek apakah account_type_id sudah digunakan oleh akun lain (Relasi 1:1)
-    public function isAccountTypeUsed($accountTypeId, $excludeAccountId = null) {
-        if (!$this->db || empty($accountTypeId)) return false;
+    // Mencari akun aktif berdasarkan nomor identifikasi untuk validasi keunikan
+    public function findByIdentificationNumber($identificationNumber, $excludeAccountId = null) {
+        if (!$this->db || empty($identificationNumber)) return null;
 
         try {
-            $sql = "SELECT id FROM accounts WHERE account_type_id = :account_type_id AND deleted_at IS NULL";
-            $params = ['account_type_id' => $accountTypeId];
+            $sql = "SELECT id FROM accounts
+                    WHERE identification_number = :identification_number
+                    AND deleted_at IS NULL";
+            $params = ['identification_number' => $identificationNumber];
 
             if (!empty($excludeAccountId)) {
                 $sql .= " AND id != :exclude_id";
@@ -66,27 +68,9 @@ class Account extends Model {
 
             $stmt = $this->db->prepare($sql);
             $stmt->execute($params);
-            return $stmt->fetch() !== false;
+            return $stmt->fetch();
         } catch (\PDOException $e) {
-            return false;
-        }
-    }
-
-    // Mengambil daftar ID tipe akun yang sudah digunakan oleh akun aktif
-    public function getUsedAccountTypeIds($excludeAccountId = null) {
-        if (!$this->db) return [];
-        try {
-            $sql = "SELECT account_type_id FROM accounts WHERE deleted_at IS NULL";
-            $params = [];
-            if (!empty($excludeAccountId)) {
-                $sql .= " AND id != :exclude_id";
-                $params['exclude_id'] = $excludeAccountId;
-            }
-            $stmt = $this->db->prepare($sql);
-            $stmt->execute($params);
-            return $stmt->fetchAll(PDO::FETCH_COLUMN);
-        } catch (\PDOException $e) {
-            return [];
+            return null;
         }
     }
 
@@ -171,4 +155,6 @@ class Account extends Model {
             return null;
         }
     }
+
+
 }
