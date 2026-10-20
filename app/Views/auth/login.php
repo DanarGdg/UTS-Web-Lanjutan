@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,6 +10,7 @@
     <!-- Icon Bootstrap -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 </head>
+
 <body class="bg-light d-flex align-items-center justify-content-center min-vh-100 py-5">
     <div class="card shadow-sm border-0" style="width: 100%; max-width: 420px;">
         <div class="card-body p-4 p-md-5">
@@ -38,27 +40,62 @@
             <form action="<?= BASE_URL ?>index.php?url=auth/login" method="POST" autocomplete="off">
                 <div class="mb-3">
                     <label for="email" class="form-label small fw-bold text-secondary">Email</label>
-                    <input 
-                        type="email" 
-                        id="email" 
-                        name="email" 
-                        class="form-control" 
+                    <input
+                        type="email"
+                        id="email"
+                        name="email"
+                        class="form-control"
                         placeholder="nama@email.com"
-                        required 
-                        autofocus
-                    >
+                        required
+                        autofocus>
                 </div>
 
                 <div class="mb-4">
                     <label for="password" class="form-label small fw-bold text-secondary">Password</label>
-                    <input 
-                        type="password" 
-                        id="password" 
-                        name="password" 
-                        class="form-control" 
+                    <input
+                        type="password"
+                        id="password"
+                        name="password"
+                        class="form-control"
                         placeholder="••••••••"
-                        required
-                    >
+                        required>
+                </div>
+
+
+                <div class="mb-3">
+                    <label for="captcha" class="form-label small fw-bold text-secondary">
+                        Kode CAPTCHA
+                    </label>
+
+                    <div class="d-flex align-items-center gap-2 mb-2">
+                        <img
+                            src="<?= BASE_URL ?>index.php?url=auth/captcha"
+                            alt="Kode CAPTCHA"
+                            width="180"
+                            height="60"
+                            class="border rounded bg-light">
+
+                        <!-- <button
+                            type="button"
+                            class="btn btn-outline-secondary"
+                            onclick="refreshCaptcha()"
+                            aria-label="Muat ulang CAPTCHA">
+                            <i class="bi bi-arrow-clockwise"></i>
+                        </button> -->
+                    </div>
+
+                    <input
+                        type="text"
+                        id="captcha"
+                        name="captcha"
+                        class="form-control"
+                        maxlength="6"
+                        autocomplete="off"
+                        required>
+
+                    <div class="form-text">
+                        Masukkan 6 karakter yang terlihat pada gambar.
+                    </div>
                 </div>
 
                 <button type="submit" class="btn btn-primary w-100 py-2 fw-semibold d-flex align-items-center justify-content-center gap-2">
@@ -71,5 +108,14 @@
 
     <!-- JS Bootstrap -->
     <script src="<?= BASE_URL ?>bootstrap-5.0.2-dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function refreshCaptcha() {
+            const captchaImage = document.querySelector('img[alt="Kode CAPTCHA"]');
+            captchaImage.src =
+                '<?= BASE_URL ?>index.php?url=auth/captcha&refresh=' +
+                Date.now();
+        }
+    </script>
 </body>
+
 </html>

@@ -1,6 +1,7 @@
 <?php
 
 require_once __DIR__ . '/../../core/Controller.php';
+require_once __DIR__ . '/../Helpers/Captcha.php';
 
 class AuthController extends Controller {
 
@@ -41,6 +42,15 @@ class AuthController extends Controller {
 
         $email = trim($_POST['email'] ?? '');
         $password = $_POST['password'] ?? '';
+        $captchaInput = trim($_POST['captcha'] ?? '');
+
+        if (!Captcha::validate($captchaInput)) {
+            $_SESSION['login_error'] =
+                'Kode CAPTCHA salah atau sudah kedaluwarsa. Silakan coba lagi.';
+
+            header('Location: ' . BASE_URL . 'index.php?url=auth');
+            exit;
+        }
 
         if (empty($email) || empty($password)) {
             $_SESSION['login_error'] = 'Email dan password wajib diisi.';
@@ -91,5 +101,9 @@ class AuthController extends Controller {
 
         header('Location: ' . BASE_URL . 'index.php?url=auth');
         exit;
+    }
+
+    public function captcha() {
+        Captcha::generate();
     }
 }
